@@ -9,14 +9,14 @@ import 'package:date_picker_timeline/gestures/tap.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class DateWidget extends StatelessWidget {
+class DateWidget extends StatefulWidget {
   final double? width;
   final DateTime date;
   final TextStyle? monthTextStyle, dayTextStyle, dateTextStyle;
   final Color selectionColor;
   final DateSelectionCallback? onDateSelected;
   final String? locale;
-
+  final bool? isSelected;
   DateWidget({
     required this.date,
     required this.monthTextStyle,
@@ -26,36 +26,46 @@ class DateWidget extends StatelessWidget {
     this.width,
     this.onDateSelected,
     this.locale,
+    this.isSelected,
   });
+
+  @override
+  State<DateWidget> createState() => _DateWidgetState();
+}
+
+class _DateWidgetState extends State<DateWidget> {
+
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       child: Container(
-        width: width,
-        margin: const EdgeInsets.all(3.0),
+        width: widget.width,
         decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-          color: selectionColor,
+          borderRadius: BorderRadius.all(Radius.circular(8.0)),
+          color: widget.selectionColor,
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Text(new DateFormat("MMM", locale).format(date).toUpperCase(), // Month
-                  style: monthTextStyle),
-              Text(date.day.toString(), // Date
-                  style: dateTextStyle),
-              Text(new DateFormat("E", locale).format(date).toUpperCase(), // WeekDay
-                  style: dayTextStyle)
-            ],
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            if(widget.isSelected == true)
+              Text(new DateFormat("E", widget.locale).format(widget.date), // WeekDay
+                  style: widget.dayTextStyle),
+            Text(widget.date.day.toString(), // Date
+                style: widget.dateTextStyle),
+            if(widget.isSelected == true)
+              Text(new DateFormat("MMM", widget.locale).format(widget.date), // Month
+                  style: widget.monthTextStyle),
+          ],
         ),
       ),
       onTap: () {
-        onDateSelected?.call(this.date);
+        // Check if onDateSelected is not null
+        if (widget.onDateSelected != null) {
+          // Call the onDateSelected Function
+          widget.onDateSelected!(this.widget.date);
+        }
       },
     );
   }
